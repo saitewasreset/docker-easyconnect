@@ -19,24 +19,24 @@
 注意，纯命令行版本仅支持下列登录方式：用户名+密码、硬件特征码。
 
 1. [安装Docker并运行](https://docs.docker.com/get-docker/)；
-2.  在终端输入：
-	``` bash
-	docker run --rm --device /dev/net/tun --cap-add NET_ADMIN -ti -p 127.0.0.1:1080:1080 -p 127.0.0.1:8888:8888 -p 127.0.0.1:1053:1053/udp -e EC_VER=7.6.3 -e CLI_OPTS="-d vpnaddress -u username -p password" hagb/docker-easyconnect:cli
-	```
-	其中 `-e EC_VER=7.6.7` 表示使用 `7.6.7` 版本的 EasyConnect，请根据实际情况修改版本号（选择 `7.6.7` 或 `7.6.3`，详见 [EasyConnect 版本选择](doc/usage.md#easyconnect-版本选择)）；`1053/udp` 用于在宿主机访问 VPN 内部 DNS，详见 [DNS 转发](doc/usage.md#dns-转发)；
+2. 在终端输入：
+   ```bash
+   docker run --rm --device /dev/net/tun --cap-add NET_ADMIN -ti -p 127.0.0.1:1080:1080 -p 127.0.0.1:8888:8888 -p 127.0.0.1:1053:1053/udp -e EC_VER=7.6.3 -e CLI_OPTS="-d vpnaddress -u username -p password" saitetimedout/docker-easyconnect:cli
+   ```
+   其中 `-e EC_VER=7.6.7` 表示使用 `7.6.7` 版本的 EasyConnect，请根据实际情况修改版本号（选择 `7.6.7` 或 `7.6.3`，详见 [EasyConnect 版本选择](doc/usage.md#easyconnect-版本选择)）；`1053/udp` 用于在宿主机访问 VPN 内部 DNS，详见 [DNS 转发](doc/usage.md#dns-转发)；
 3. 根据提示输入服务器地址、登录凭据。
 
 ### 图形界面版 EasyConnect（x86、amd64、arm64、mips64el 架构）
 
 1. [安装Docker并运行](https://docs.docker.com/get-docker/)；
-2. 在终端输入： `docker run --rm --device /dev/net/tun --cap-add NET_ADMIN -ti -e PASSWORD=xxxx -e URLWIN=1 -v $HOME/.ecdata:/root -p 127.0.0.1:5901:5901 -p 127.0.0.1:1080:1080 -p 127.0.0.1:8888:8888 hagb/docker-easyconnect:7.6.7`（末尾 EasyConnect 版本号 `7.6.7` 请根据实际情况修改；arm64 和 mips64el 架构需要加入 `-e DISABLE_PKG_VERSION_XML=1` 参数）；
+2. 在终端输入： `docker run --rm --device /dev/net/tun --cap-add NET_ADMIN -ti -e PASSWORD=xxxx -e URLWIN=1 -v $HOME/.ecdata:/root -p 127.0.0.1:5901:5901 -p 127.0.0.1:1080:1080 -p 127.0.0.1:8888:8888 saitetimedout/docker-easyconnect:7.6.7`（末尾 EasyConnect 版本号 `7.6.7` 请根据实际情况修改；arm64 和 mips64el 架构需要加入 `-e DISABLE_PKG_VERSION_XML=1` 参数）；
 3. 使用vnc客户端连接vnc， 地址：`127.0.0.1`，端口: 5901, 密码 xxxx；
 4. 成功连上后你应该能看到 EasyConnect 的登录窗口，填写登录凭据并登录，若需要 web 登录可参看 [web 登录](doc/usage.md#web-登录)。
 
 ### 图形界面版 aTrust（amd64、arm64、mips64el 架构）
 
 1. [安装Docker并运行](https://docs.docker.com/get-docker/)；
-2. 在终端输入： `docker run --rm --device /dev/net/tun --cap-add NET_ADMIN -ti -e PASSWORD=xxxx -e URLWIN=1 -v $HOME/.atrust-data:/root -p 127.0.0.1:5901:5901 -p 127.0.0.1:1080:1080 -p 127.0.0.1:8888:8888 -p 127.0.0.1:54631:54631 --sysctl net.ipv4.conf.default.route_localnet=1 hagb/docker-atrust`；
+2. 在终端输入： `docker run --rm --device /dev/net/tun --cap-add NET_ADMIN -ti -e PASSWORD=xxxx -e URLWIN=1 -v $HOME/.atrust-data:/root -p 127.0.0.1:5901:5901 -p 127.0.0.1:1080:1080 -p 127.0.0.1:8888:8888 -p 127.0.0.1:54631:54631 --sysctl net.ipv4.conf.default.route_localnet=1 saitetimedout/docker-atrust`；
 3. 使用vnc客户端连接vnc， 地址：127.0.0.1，端口: 5901, 密码 xxxx；
 4. 成功连上后你应该能看到 aTrust 的登录窗口；若需要 web 登录，在宿主机的浏览器打开 aTrust 弹出的网址网址登录即可；若需要无人值守的自动化登录和保活，请[参见此处](https://github.com/kenvix/aTrustLogin)。
 5. 若必须经过 web 界面登录或 web 端需要唤起 `atrust://browserstart` 详见 [#433](https://github.com/docker-easyconnect/docker-easyconnect/issues/443)，你可以使用内置 chromium 版镜像，启动命令需加上 `-e CHROMIUM=1`，详见 [构建带有chromium的VNC镜像](doc/build.md#构建带有-chromium-的-VNC-镜像)。
@@ -46,7 +46,7 @@
 ### 从 Docker Hub 上直接获取：
 
 ```
-docker pull hagb/docker-easyconnect:TAG
+docker pull saitetimedout/docker-easyconnect:TAG
 ```
 
 其中 TAG 可以是如下值（不带 VNC 服务端的 image 比带 VNC 服务端的 image 小）：
@@ -77,18 +77,19 @@ docker pull hagb/docker-easyconnect:TAG
 >
 > This work is free. You can redistribute it and/or modify it under the  
 > terms of the Do What The Fuck You Want To Public License, Version 2,  
-> as published by Sam Hocevar. See the COPYING file for more details. 
+> as published by Sam Hocevar. See the COPYING file for more details.
 >
->        DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE  
->                    Version 2, December 2004  
+>        DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+>                    Version 2, December 2004
 >
-> Copyright (C) 2004 Sam Hocevar <sam@hocevar.net>  
+> Copyright (C) 2004 Sam Hocevar <sam@hocevar.net>
 >
 > Everyone is permitted to copy and distribute verbatim or modified  
 > copies of this license document, and changing it is allowed as long  
-> as the name is changed.  
->  
->            DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE  
->   TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION  
->  
->  0. You just DO WHAT THE FUCK YOU WANT TO. 
+> as the name is changed.
+>
+>            DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+>
+> TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
+>
+> 0.  You just DO WHAT THE FUCK YOU WANT TO.

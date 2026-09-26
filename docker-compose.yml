@@ -1,7 +1,7 @@
 version: '2'
 services:
     easyconnect:
-        image: hagb/docker-easyconnect:7.6.7 # latest, vncless, 7.6.3, vncless-7.6.3, 7.6.7, vncless-7.6.7
+        image: saitetimedout/docker-easyconnect:7.6.7 # latest, vncless, 7.6.3, vncless-7.6.3, 7.6.7, vncless-7.6.7
         devices:
           - /dev/net/tun
         cap_add: 
