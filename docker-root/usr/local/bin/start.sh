@@ -220,6 +220,10 @@ fi
 init_vpn_config
 wait
 
+if [ "EC_CLI" = "$_VPN_TYPE" ]; then
+	socat -T 10 UDP4-RECVFROM:1053,reuseaddr,fork UDP4-SENDTO:127.0.0.1:53 &
+fi
+
 [ -n "$EXIT" ] && export MAX_RETRY=0
 start-sangfor.sh &
 wait $!

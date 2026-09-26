@@ -14,16 +14,15 @@
 
 - `FORWARD`: 默认为空，用于将 vpn 服务端一侧对客户端虚拟 ip 发起的访问转发到客户端侧的 ip，格式如下（以下所有 ip 均为 ipv4 ip）：
 
-    > [SOURCE_IP:]CONTAINER_PORT:DESTINATION_IP:DESTINATION_PORT
+  > [SOURCE_IP:]CONTAINER_PORT:DESTINATION_IP:DESTINATION_PORT
 
-    其中
+  其中
+  - `SOURCE_IP`: 可选项。服务端侧发起连接的 ip 或 ip 段，这些 ip 对容器的 `CONTAINER_PORT` 端口发起的连接允许被转发，为空则服务端侧任意 IP 对容器 `CONTAINER_PORT` 端口发起的连接都会被转发。
+  - `CONTAINER_PORT`: 容器接受服务端侧传入连接的端口
+  - `DESTINATION_IP`: 转发的目的 ip
+  - `DESTINATION_PORT`: 转发的目的端口
 
-    - `SOURCE_IP`: 可选项。服务端侧发起连接的 ip 或 ip 段，这些 ip 对容器的 `CONTAINER_PORT` 端口发起的连接允许被转发，为空则服务端侧任意 IP 对容器 `CONTAINER_PORT` 端口发起的连接都会被转发。
-    - `CONTAINER_PORT`: 容器接受服务端侧传入连接的端口
-    - `DESTINATION_IP`: 转发的目的 ip
-    - `DESTINATION_PORT`: 转发的目的端口
-
-    例如：`1010:172.17.0.1:1013` 指服务端侧所有 ip 访问容器的 `1010` 端口会被转发到 `172.17.0.1:1013`；`10.234.0.0/24:1010:172.17.0.1:1013` 指服务端侧 `10.234.0.0/24`（即 `10.234.0.0`~`10.234.0.255`）访问容器的 `1010` 端口会被转发到 `172.17.0.1:1013`；`10.234.0.1:1010:172.17.0.1:1013` 指服务端侧 `10.234.0.1` 访问容器的 `1010` 端口会被转发到 `172.17.0.1:1013`
+  例如：`1010:172.17.0.1:1013` 指服务端侧所有 ip 访问容器的 `1010` 端口会被转发到 `172.17.0.1:1013`；`10.234.0.0/24:1010:172.17.0.1:1013` 指服务端侧 `10.234.0.0/24`（即 `10.234.0.0`~`10.234.0.255`）访问容器的 `1010` 端口会被转发到 `172.17.0.1:1013`；`10.234.0.1:1010:172.17.0.1:1013` 指服务端侧 `10.234.0.1` 访问容器的 `1010` 端口会被转发到 `172.17.0.1:1013`
 
 - `IPTABLES_LEGACY`: 默认为空。设为非空值时强制要求 `iptables-legacy`。
 
@@ -46,17 +45,17 @@
 - `EC_VER`: 指定运行的 EasyConnect 版本，必填
 
 - `CLI_OPTS`: 默认为空，给 `easyconn login` 加上的额外参数，可用参数如下：
-	```
-	-d vpn address, make sure it's assigned and the format is right, like "199.201.73.191:443"
-	-t login type, "pwd" means username/password authentication
-	               "cert" means certificate authentication
-	-u username
-	-p password
-	-c certificate path
-	-m password for certificate
-	-l certificate used to be authentication
-	```
-	例如 `CLI_OPTS="-d 服务器地址 -u 用户名 -p 密码"` 可实现原登录信息失效时自动登录。
+  ```
+  -d vpn address, make sure it's assigned and the format is right, like "199.201.73.191:443"
+  -t login type, "pwd" means username/password authentication
+                 "cert" means certificate authentication
+  -u username
+  -p password
+  -c certificate path
+  -m password for certificate
+  -l certificate used to be authentication
+  ```
+  例如 `CLI_OPTS="-d 服务器地址 -u 用户名 -p 密码"` 可实现原登录信息失效时自动登录。
 
 ### 仅适用于图形界面版本的环境变量
 
@@ -67,10 +66,9 @@
 - `PASSWORD`: 用于设置 vnc 服务的密码，该变量的值默认为空字符串，表示密码不作改变。变量不为空时，密码（应小于或等于 8 位）就会被更新到变量的值。默认密码是`password`.
 
 - `TYPE`（仅适用于非 `vncless` 的图形界面镜像）: 如何显示图形界面。有以下两种选项:
+  - `x11`或`X11`: 将直接通过`DISPLAY`环境变量的值显示前端，请同时设置`DISPLAY`环境变量。
 
-	- `x11`或`X11`: 将直接通过`DISPLAY`环境变量的值显示前端，请同时设置`DISPLAY`环境变量。
-
-	- 其它任何值（默认值）: 将在`5901`端口开放 vnc 服务以操作前端。
+  - 其它任何值（默认值）: 将在`5901`端口开放 vnc 服务以操作前端。
 
 - `URLWIN`: 默认为空，此时当 VPN 前端想要调用浏览器时，不会弹窗，若该变量设为任何非空值，则会弹出一个包含链接的对话框供用户复制。
 
@@ -91,6 +89,16 @@ socks5 和 http 代理会分别在容器的 `1080` 和 `8888` 端口开启，VPN
 ```python3
 requests.get('https://www.hao123.com', proxies={'http': '127.0.0.1:8888'})
 ```
+
+### DNS 转发
+
+纯命令行版会将容器 `1053/udp` 上的 DNS 请求转发到 EasyConnect 在容器内的 `127.0.0.1:53/udp`。启动容器时加入 `-p 127.0.0.1:1053:1053/udp`，VPN 登录后即可从宿主机查询，例如：
+
+```bash
+dig @127.0.0.1 -p 1053 example.internal
+```
+
+此转发仅支持 UDP。VPN 未登录或断线期间查询会失败，重连后可继续使用。
 
 ### ip forward
 
@@ -164,26 +172,25 @@ EasyConnect 客户端大致有以下三种版本
 
 下列例子可启动纯命令行的 EasyConnect `7.6.7`（`-e EC_VER=7.6.7`），并且退出后不会自动重启（`-e EXIT=1`）。
 
-``` bash
+```bash
 touch ~/.easyconn
-docker run --rm --device /dev/net/tun --cap-add NET_ADMIN -ti -v $HOME/.easyconn:/root/.easyconn -e EC_VER=7.6.7 -e EXIT=1 -p 127.0.0.1:1080:1080 -p 127.0.0.1:8888:8888 hagb/docker-easyconnect:cli
+docker run --rm --device /dev/net/tun --cap-add NET_ADMIN -ti -v $HOME/.easyconn:/root/.easyconn -e EC_VER=7.6.7 -e EXIT=1 -p 127.0.0.1:1080:1080 -p 127.0.0.1:8888:8888 -p 127.0.0.1:1053:1053/udp hagb/docker-easyconnect:cli
 ```
 
 ### X11 socket
 
 在当前桌面环境中启动 EasyConnect 前端，并且该前端退出后不会自动重启（`-e EXIT=1`），EasyConnect 要进行浏览器弹窗时会弹出含链接的文本框（`-e URLWIN=1`）。
 
-``` bash
+```bash
 xhost +LOCAL:root
 docker run --rm --device /dev/net/tun --cap-add NET_ADMIN -ti -v /tmp/.X11-unix:/tmp/.X11-unix -v $HOME/.Xauthority:/root/.Xauthority -e EXIT=1 -e DISPLAY=$DISPLAY -e URLWIN=1 -e TYPE=x11 -v $HOME/.ecdata:/root -p 127.0.0.1:1080:1080 -p 127.0.0.1:8888:8888 hagb/docker-easyconnect:vncless
 xhost -LOCAL:root
 ```
 
-### vnc 
+### vnc
 
 客户端退出会自动重启，VNC 服务器在`127.0.0.1:5901`（`-p 127.0.0.1:5901:5901`），密码为`xxxx`（`-e PASSWORD=xxxx`）。
 
-``` bash
+```bash
 docker run --rm --device /dev/net/tun --cap-add NET_ADMIN -ti -e PASSWORD=xxxx -v $HOME/.ecdata:/root -p 127.0.0.1:5901:5901 -p 127.0.0.1:1080:1080 -p 127.0.0.1:8888:8888 hagb/docker-easyconnect
 ```
-
